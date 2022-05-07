@@ -5,7 +5,7 @@ import './Game.css'
 // 轮流下棋
 // 判断谁赢
 // 记录进程，并能返回查看
-function calculateWinner(squares, count) {
+function calculateWinner(squares, length, count) {
   const arrX = []
   const arrO = []
   squares.map((item, index) => {
@@ -17,31 +17,38 @@ function calculateWinner(squares, count) {
   })
   arrO.sort((a, b) => a - b)
   arrX.sort((a, b) => a - b)
+  let flags = [length - 1, length, length + 1, 1]
   if (arrO.length + arrX.length < count * 2 - 1) {
     return null
   } else {
-    let stop = ''
-    // 排序后，四个数之间的差相等
     if (arrX.length > arrO.length) {
-      for (let i = 0; i < arrX.length - 1; i++) {
-        const itemX = []
-        for (let c = 0; c < count - 1; c++) {
-          itemX.push(arrX[c + 1] - arrX[c])
+      for (let i = 0; i < arrX.length; i++) {
+        let items = []
+        let test = []
+        let z = i
+        // i与所有数相减，找出两个值等于flags内任意一个
+        for (let j = 0; j < arrX.length; j++,z++){
+          test.push([arrX[z],arrX[j]])
+          console.log("test",test)
+          items.push(Math.abs(arrX[z] - arrX[j]))
         }
-        if ((new Set(itemX)).size === 1) {
-          stop = 'X'
-          return stop
+        for(let k = 0; k < flags.length; k++){
+          if(items.filter((item)=>item==flags[k]).length == count-1){
+            return 'X'
+          }
         }
       }
     } else {
       for (let i = 0; i < arrO.length; i++) {
-        const itemO = []
-        for (let c = 0; c < count - 1; c++) {
-          itemO.push(arrO[c + 1] - arrO[c])
+      let items = []
+      let z = i
+        for (let j = 0; j < arrO.length; j++, z++){
+          items.push(Math.abs(arrO[z] - arrO[j]))
         }
-        if ((new Set(itemO)).size === 1) {
-          stop = 'O'
-          return stop
+        for(let k = 0; k < flags.length; k++){
+          if(items.filter((item)=>item==flags[k]).length == count-1 ){
+            return 'O'
+          }
         }
       }
     }
@@ -73,7 +80,7 @@ function SelModel(props) {
     { model: '五连棋', count: 5, isSel: false },
   ]
   const element = modelArr.map((item) =>
-    <button className="modelBtn" key={item.count} onClick={() => props.onClick(item.count)}>{item.model}</button>
+    <button className="btn" key={item.count} onClick={() => props.onClick(item.count)}>{item.model}</button>
   )
   return (element)
 }
@@ -86,22 +93,24 @@ class Game extends React.Component {
     this.state = {
       history: [{ squares: Array(Math.pow(3, 2)).fill(null) }],
       xIsNext: true,
-      count: 3 // 几字棋子
+      count: 3, // 几连棋子
+      stepFlag: 0,
     }
   }
   handleClick = (i) => {
-    const history = this.state.history.slice()
+    const history = this.state.history.slice(0, this.state.stepFlag + 1)
     const current = history[history.length - 1]
     const squares = current.squares.slice()
-    if (calculateWinner(current.squares, this.state.count) || squares[i]) {
+    if (calculateWinner(current.squares, this.length, this.state.count) || squares[i]) {
       return;
     }
     squares[i] = this.state.xIsNext ? 'X' : 'O'
     this.setState({
-      history: this.state.history.concat([{
+      history: history.concat([{
         squares
       }]),
-      xIsNext: !this.state.xIsNext
+      xIsNext: !this.state.xIsNext,
+      stepFlag: history.length
     })
   }
   manageBtn = (i) => {
@@ -113,44 +122,57 @@ class Game extends React.Component {
     this.model = i === 3 ? '三连棋' : (i === 4 ? '四连棋' : '五连棋')
     // this.isDisable = true
   }
+  jumpTo = (step) => {
+    this.setState({
+      stepFlag: step,
+      xIsNext: step % 2 == 0
+    })
+  }
   reset = () => {
     const count = this.state.count
     this.setState({
       history: [{ squares: Array(Math.pow(3, 2)).fill(null) }],
       xIsNext: true,
-      count: count
+      count: count,
+      stepFlag: 0
     })
   }
   render() {
     const history = this.state.history
-    const current = history[history.length - 1]
-    const winner = calculateWinner(current.squares, this.state.count)
+    const current = history[this.state.stepFlag]
+    const winner = calculateWinner(current.squares, this.length, this.state.count)
     let isInit = new Set(current.squares);
     let status;
     if (winner) {
       status = 'Winner: ' + winner
     } else {
-      if(isInit.size === 1 && isInit.has(null)){
+      if (isInit.size === 1 && isInit.has(null)) {
         status = 'please start the game!'
-      }else{
+      } else {
         status = 'Next player: ' + (this.state.xIsNext ? 'X' : 'O')
       }
     }
+    console.log('winner',winner)
+    let moves = history.map((item, step) => {
+      const desc = step === 0 ? "go to init" : `go to step ${step}`
+      return (<div key={step}><button className="btn" onClick={() => this.jumpTo(step)} disabled={winner ? true : false}>{desc}</button></div>)
+    })
     return (
       <div className="game-box">
         <div className="game-left">
           <div className="select-box">
-            <h2 style={{color: '#fbc847'}}>{status}</h2>
+            <h2 style={{ color: '#fbc847' }}>{status}</h2>
             <p>当前模式：{this.model}</p>
             切换模式：<SelModel onClick={(i) => this.manageBtn(i)}></SelModel>
             {/* <button>选择棋盘大小<button></button><button></button><button></button></button> */}
-            <button className="modelBtn" onClick={this.reset}>重新开始</button>
+            <button className="btn" onClick={this.reset}>重置</button>
           </div>
           <Board count={this.length} squares={current.squares} onClick={(i) => this.handleClick(i)}></Board>
         </div>
         <div className="game-right">
           <div className="tip-box">
             <div>历史记录</div>
+            <div>{moves}</div>
           </div>
         </div>
 

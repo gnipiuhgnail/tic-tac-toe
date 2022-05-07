@@ -21,7 +21,7 @@ function calculateWinner(squares, count) {
     return null
   } else {
     let stop = ''
-    // 排序后，四个数之间的差相等
+    // 排序后，四个数之间的差同时等于length/length-1/length+1/1
     if (arrX.length > arrO.length) {
       for (let i = 0; i < arrX.length - 1; i++) {
         const itemX = []

@@ -1,8 +1,8 @@
 /* 公共样式 */
-.modelBtn{
+.btn{
   margin-right: 12px;
   background-color: #abcdef;
-  border: 1px #ccc solid;
+  border: 1px rgb(112, 107, 107) solid;
   border-radius: 3px;
   padding: 4px 7px;
 }
@@ -12,9 +12,9 @@
   justify-content: center;
   margin: 30px;
 }
-.game-left{
+/* .game-left{
   width: 80%;
-}
+} */
 .game-left .select-box{
   margin: 12px 0;
 }
@@ -48,8 +48,12 @@
 }
 .game-right .tip-box {
   margin-left: 50px;
-  text-align: left;
-  border: 1px #ccc solid;
+  border: 1px rgb(112, 107, 107) solid;
+  padding: 8px;
+}
+.game-right  button {
+  width: 100%;
+  margin: 4px 0;
 }
 
 
