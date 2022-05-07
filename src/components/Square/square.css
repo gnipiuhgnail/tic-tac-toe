@@ -1,0 +1,10 @@
+.square {
+	display: table-cell;
+	width: 50px;
+	height: 50px;
+	line-height: 50px;
+	color: #abcdef;
+	font-size: 22px;
+	background-color: #fff;
+	border: 0.5px solid #ccc;
+}

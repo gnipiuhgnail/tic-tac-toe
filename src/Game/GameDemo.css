@@ -1,0 +1,33 @@
+.status {
+	font-weight: 600;
+	margin: 10px auto;
+	font-size: 22px;
+}
+.board-box, .game-info{
+	width: 158px;
+	margin: 10px auto;
+}
+ol li {
+  margin: 5px 0;
+}
+button{
+  background-color: #abcdef;
+  border: 1px solid #ccc;
+  padding: 4px 5px;
+  border-radius: 5px;
+}
+.board-row{
+	height: 51px;
+	border: 0.5px solid #ccc;
+	border-bottom: none;
+}
+.square {
+	display: table-cell;
+	width: 50px;
+	height: 50px;
+	line-height: 50px;
+	color: #abcdef;
+	font-size: 22px;
+	background-color: #fff;
+	border: 0.5px solid #ccc;
+}
