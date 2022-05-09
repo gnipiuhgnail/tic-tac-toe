@@ -2,33 +2,49 @@
 .btn{
   margin-right: 12px;
   background-color: #abcdef;
-  border: 1px rgb(112, 107, 107) solid;
+  border: 1px rgb(197, 192, 192) solid;
   border-radius: 3px;
   padding: 4px 7px;
 }
+.flexBetween {
+  display: flex;
+  justify-content: space-between;
+}
 /* 其他 */
 .game-box{
-  display: flex;
-  justify-content: center;
-  margin: 30px;
+  margin: 0 30px;
 }
-/* .game-left{
-  width: 80%;
-} */
-.game-left .select-box{
+.game-box h2 {
+  margin-top: 0;
+}
+.game-left {
+  width: 10%;
+  height: 100%;
+  margin: 80px 5px;
+  padding: 10px;
+  text-align: right;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: rgb(237, 233, 233);
+}
+.game-left .btn {
+  margin-top: 5px;
+}
+
+.game-center .select-box{
   margin: 12px 0;
 }
-.game-left .select-box div {
+.game-center .select-box div {
   display: block;
 }
-.game-left .tr-box{
+.game-center .tr-box{
   display: flex;
   justify-content: center;
 }
-.game-left .tr-box:last-child .square{
+.game-center .tr-box:last-child .square{
   border-bottom: 2px solid #ccc;
 }
-.game-left .square {
+.game-center .square {
   width: 50px;
   height: 50px;
   display: inline-block;
@@ -38,23 +54,26 @@
   font-weight: 400;
   font-size: 30px;
 }
-.game-left .square:nth-child(1){
+.game-center .square:nth-child(1){
   border-left: 2px solid #ccc;
 }
 .game-right {
-  width: 20%;
+  width: 25%;
   height: 100%;
+  margin: 50px 0;
+  background-color: rgb(237, 233, 233);
+  border: 1px rgb(112, 107, 107) solid;
+  min-height: 580px;
 }
 .game-right .tip-box {
-  border: 1px rgb(112, 107, 107) solid;
-  padding: 8px;
+  padding: 16px;
 }
 .game-right .tip-box .order{
   display: inline-block;
   width: 25px;
   height: 25px;
   margin-right: 5px;
-  background-color: slateblue;
+  background-color: #abcdef;
   font-size: 18px;
   color: #fff;
 }

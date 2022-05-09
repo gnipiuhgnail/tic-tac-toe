@@ -6,13 +6,11 @@
 import React from "react"
 import './Game.css'
 function calculateWinner(squares, length, count) {
-  console.log("11111111",length,count)
   const squaresLen = squares.filter( item => item==='X'|| item==='O').length
   if( squaresLen < (count *2 -1)){
     return null
   }else{
     for (let i = 0; i<squares.length; i++) {
-      console.log("s",squares)
       const x = squares
       let horizontalArr = {
         winnerValue: new Set(), // 每个位置的值
@@ -32,51 +30,42 @@ function calculateWinner(squares, length, count) {
       }
       for (let j = 0; j < count; j++) {
         // 获取水平线的
-        console.log(":::::",i%length, length-count-1, length*(length-count-1)-1)
-        if((i%length) <(length-count-1)){
+        const ex0 = length - count + 1
+        const ex1 = i % length < ex0
+        const ex2 = i / length < ex0
+        const ex3 = i > ex0
+        if(ex1){
           horizontalArr.winnerIndex.push(i+j)
           horizontalArr.winnerValue.add(x[i+j])
         }
-        if(i<length*(length-count-1)-1){
+        if(ex2){
           verticalArr.winnerIndex.push(i+j*length)
           verticalArr.winnerValue.add(x[i+j*length])
         }
-        if(i<length*(length-count-1)-1 && (i%length) <(length-count-1)){
+        if(ex1 && ex2){
           diagonalLowerArr.winnerIndex.push(i+j*(length+1))
           diagonalLowerArr.winnerValue.add(x[i+j*(length+1)])
         }
-        if(i-j*(length-1) > 0 && (i%length) <(length-count-1) && i > length *(length-count-1)-1) {
+        if(i-j*(length-1) > 0 && ex1 && i > ex3) {
           diagonalUpperArr.winnerIndex.push(i-j*(length-1))
           diagonalUpperArr.winnerValue.add(x[i-j*(length-1)])
         }
-        console.log(i,[i+j,i+j*length,i+j*(length+1),i-j*(length-1)])
       }
-      console.log(horizontalArr.winnerIndex)
-      console.log(verticalArr.winnerIndex)
-      console.log(diagonalLowerArr.winnerIndex)
-      console.log(diagonalUpperArr.winnerIndex)
       let result
       if(!(horizontalArr.winnerValue.has(null) || horizontalArr.winnerValue.has(undefined)) && horizontalArr.winnerValue.size === 1 && horizontalArr.winnerIndex.length === count){
-        result = horizontalArr
+        return result = horizontalArr
+      } else if(!(verticalArr.winnerValue.has(null) || verticalArr.winnerValue.has(undefined)) && verticalArr.winnerValue.size === 1 && verticalArr.winnerIndex.length === count){
+        return result = verticalArr
+      } else if(!(diagonalLowerArr.winnerValue.has(null) || diagonalLowerArr.winnerValue.has(undefined)) && diagonalLowerArr.winnerValue.size === 1 && diagonalLowerArr.winnerIndex.length === count){
+        return result = diagonalLowerArr
+      } else if(!(diagonalUpperArr.winnerValue.has(null) || diagonalUpperArr.winnerValue.has(undefined)) && diagonalUpperArr.winnerValue.size === 1 && diagonalUpperArr.winnerIndex.length === count){
+        return result = diagonalUpperArr
+      } else if(squaresLen === Math.pow(length,2)){
+        return result =  {
+          winnerValue: new Set('D'), 
+          winnerIndex: [] 
+        }
       }
-      else if(!(verticalArr.winnerValue.has(null) || verticalArr.winnerValue.has(undefined)) && verticalArr.winnerValue.size === 1 && verticalArr.winnerIndex.length === count){
-        result = verticalArr
-      }
-      else if(!(diagonalLowerArr.winnerValue.has(null) || diagonalLowerArr.winnerValue.has(undefined)) && diagonalLowerArr.winnerValue.size === 1 && diagonalLowerArr.winnerIndex.length === count){
-        result = diagonalLowerArr
-      }
-      else if(!(diagonalUpperArr.winnerValue.has(null) || diagonalUpperArr.winnerValue.has(undefined)) && diagonalUpperArr.winnerValue.size === 1 && diagonalUpperArr.winnerIndex.length === count){
-        result = diagonalUpperArr
-      }
-      console.log("res" , result)
-      if(result){
-        return result
-      }else if(squaresLen === Math.pow(length,2)){
-        return {winner:'D',winerList:[]}
-      }
-
-
-
       // for (let j = 0; j < count; j++) {
       //   horizontalArr.push(x[i+j])
       //   verticalArr.push(x[i+j*length])
@@ -96,10 +85,9 @@ function calculateWinner(squares, length, count) {
       // }
     }
   }
-  
 }
 function Square(props) {
-  return (<div className="square" style={{color: props.value=='X'?'slateblue':'crimson'}} onClick={props.onClick}>{props.value}</div>)
+  return (<div className="square" style={{color: props.value=='X'?'slateblue':'green',backgroundColor: props.isConnect ? "#ffe680":''}} onClick={props.onClick}>{props.value} </div>)
 }
 function Board(props) {
   const count = props.count
@@ -108,7 +96,8 @@ function Board(props) {
     const item = []
     for (let j = 0; j < count; j++) {
       const flag = j + i * count
-      item.push(<Square key={flag} value={props.squares[flag]} onClick={() => props.onClick(flag)} />) // 调用
+      const connectList = props.connectList ? props.connectList.some(i => i == flag) : ''
+      item.push(<Square key={flag} isConnect={connectList} value={props.squares[flag]} onClick={() => props.onClick(flag)} />) // 调用
     }
     element.push(<div className="tr-box" key={i}>{item}</div>)
   }
@@ -123,14 +112,14 @@ function SelModel(props) {
     { model: '五连棋', count: 5, isSel: false },
   ]
   const element = modelArr.map((item) =>
-    <button className="btn" key={item.count} onClick={() => props.onClick(item.count)}>{item.model}</button>
+    <div key={item.count}><button className="btn" onClick={() => props.onClick(item.count)}>{item.model}</button></div>
   )
   return (element)
 }
 class Game extends React.Component {
   constructor(props) {
     super(props);
-    this.length = 5 // 表格长度
+    this.length = 10 // 表格长度
     this.model = "三连棋"
     this.isDisable = false
     this.state = {
@@ -172,7 +161,6 @@ class Game extends React.Component {
       stepFlag: 0
     })
     this.model = i === 3 ? '三连棋' : (i === 4 ? '四连棋' : '五连棋')
-    // this.isDisable = true
   }
   jumpTo = (step) => {
     this.setState({
@@ -194,18 +182,17 @@ class Game extends React.Component {
     const current = history[this.state.stepFlag]
     const result = calculateWinner(current.squares, this.length, this.state.count)
     const winner = result?.winnerValue
-    console.log('winner',winner)
+    const connectList = result?.winnerIndex
     let isInit = new Set(current.squares);
     let status;
-    if (winner === 'D') {
-      status = "Double Win"
-    } else if(winner){
-      status = 'Winner: ' + (winner.has('X') ? 'X' : 'O')
+    if(winner){
+      status = <div style={{ color: 'crimson' }}>{winner.has('D') ? "Double Win" :('Winner: ' + (winner.has('X') ? 'X' : (winner.has('O') ? 'O' :'')))}</div>
     } else {
       if (isInit.size === 1 && isInit.has(null)) {
-        status = 'please start the game!'
+        status = <div>please start the game!</div>
       } else {
-        status = 'Next player: ' + (this.state.xIsNext ? 'X' : 'O')
+        const isX = this.state.xIsNext ? 'X' : 'O'
+        status = <div><span style={{ color: '#333' }}>Next player: </span> <span style={{ color: isX === 'X' ? 'slateblue': 'green' }}> { isX}</span></div>
       }
     }
     let stepFlag = this.state.stepFlag
@@ -217,24 +204,26 @@ class Game extends React.Component {
       const coordinate = item.coordinate.filter(item => item).join('、')
       const curStep = order == 'asc' ? step : ( step == 0 ? 0 : Math.abs(history.length - step) )
       const flag = stepFlag == curStep
-      const desc = step === 0 ? "go to init: (row,column)" : `go to step ${step} : ${coordinate}`
+      const desc = step === 0 ? "go to init: (row,column)" : `go to step ${curStep} : ${coordinate}`
       return (<div key={curStep}><button  disabled={winner ? true : false} className={flag ?'historyListSelBtn btn': 'btn'}  onClick={() => this.jumpTo(curStep)}>{desc}</button></div>)
     })
     return (
-      <div className="game-box">
-        <div className="game-left">
-          <div className="select-box">
-            <h2 style={{ color: '#fbc847' }}>{status}</h2>
-            <p>当前模式：{this.model}</p>
-            切换模式：<SelModel onClick={(i) => this.manageBtn(i)}></SelModel>
-            {/* <button>选择棋盘大小<button></button><button></button><button></button></button> */}
-            <button className="btn" onClick={this.reset}>重置</button>
+      <div className="game-box flexBetween">
+        <div className="game-left flexBetween">
+          <div style={{width:'20px'}}>切换模式</div>
+          <div><SelModel onClick={(i) => this.manageBtn(i)}></SelModel></div>
           </div>
-          <Board count={this.length} squares={current.squares} onClick={(i) => this.handleClick(i)}></Board>
+        <div className="game-center">
+          <div className="select-box">
+            <h2>{status}</h2>
+            <p className="flexBetween"><span>当前模式：{this.model}</span><button className="btn" style={{marginLeft:'35px'}} onClick={this.reset}>重新开始</button></p>
+            {/* <button>选择棋盘大小<button></button><button></button><button></button></button> */}
+          </div>
+          <Board count={this.length} squares={current.squares} onClick={(i) => this.handleClick(i)} connectList={connectList}></Board>
         </div>
         <div className="game-right">
           <div className="tip-box">
-            <div style={{display:'flex',justifyContent: 'space-between'}}>历史记录 
+            <div  className="flexBetween" style={{marginBottom: '10px'}}>历史记录 
               <div>
                 <div className="order" onClick={() => this.setState({
                   order:'asc'
