@@ -1,5 +1,6 @@
 // 能够判定玩家何时获胜
 // 能够记录游戏进程
+// 使用两个循环来渲染出棋盘的格子，而不是在代码里写死（hardcode）。
 import React from "react"
 import './Game.css'
 function calculateWinner(squares, count) {
